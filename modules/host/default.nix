@@ -6,7 +6,7 @@
   netvm,
 }: {...}: {
   imports = [
-    (import ./minimal.nix)
+    (import ./minimal)
 
     microvm.nixosModules.host
 
