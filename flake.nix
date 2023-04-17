@@ -61,6 +61,9 @@
         formatter = nixpkgs.legacyPackages.${system}.alejandra;
       }))
 
+      # Utilities
+      {lib = import ./lib {inherit self;};}
+
       # Target configurations
       (import ./targets {inherit self nixpkgs nixos-generators nixos-hardware microvm jetpack-nixos;})
 
