@@ -3,14 +3,9 @@
 {
   lib,
   pkgs,
-  modulesPath,
   ...
 }: {
   imports = [
-    # TODO remove this when the minimal config is defined
-    # Replace with the baseModules definition
-    (modulesPath + "/profiles/minimal.nix")
-
     ../../overlays/custom-packages.nix
 
     # TODO: Refactor this under virtualization/microvm/host/networking.nix

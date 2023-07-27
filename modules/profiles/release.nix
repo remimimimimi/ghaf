@@ -4,6 +4,7 @@
 {
   config,
   lib,
+  modulesPath,
   ...
 }: let
   cfg = config.ghaf.profiles.release;
@@ -13,11 +14,11 @@ in
       enable = mkEnableOption "release profile";
     };
 
-    config = mkIf cfg.enable {
+    config = mkIf cfg.enable ({
       # Enable default accounts and passwords
       # TODO this needs to be refined when we define a policy for the
       # processes and the UID/groups that should be enabled by default
       # if not already covered by systemd
       ghaf.users.accounts.enable = true;
-    };
+    } // import (modulesPath + "/profiles/minimal.nix") { inherit config lib; });
   }
