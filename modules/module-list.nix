@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 #
-[
+moreInputs @ {...}: [
   ./development/debug-tools.nix
   ./development/nix.nix
   ./development/ssh.nix
   ./graphics
   ./hardware/x86_64-linux.nix
-  ./installer
+  (import ./installer moreInputs)
   ./profiles/applications.nix
   ./profiles/debug.nix
   ./profiles/graphics.nix

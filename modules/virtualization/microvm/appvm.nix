@@ -104,7 +104,7 @@
             };
           };
 
-          imports = import ../../module-list.nix;
+          imports = lib.ghaf.modules;
         })
       ];
     };

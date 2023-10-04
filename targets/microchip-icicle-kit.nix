@@ -53,7 +53,7 @@
             disabledModules = ["profiles/all-hardware.nix"];
           }
         ]
-        ++ (import ../modules/module-list.nix)
+        ++ lib.ghaf.modules
         ++ extraModules;
     };
   in {

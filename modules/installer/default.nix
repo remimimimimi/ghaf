@@ -1,6 +1,6 @@
 # Copyright 2022-2023 TII (SSRC) and the Ghaf contributors
 # SPDX-License-Identifier: Apache-2.0
-inputs @ {
+moreInputs @ {disko, ...}: inputs @ {
   config,
   lib,
   pkgs,
@@ -74,7 +74,7 @@ in {
 
   config = lib.mkIf cfg.enable (let
     builtinModulesPaths = map (name: "${./builtin}/${name}.nix") ["flush"];
-    modulePath2Module = path: import path inputs;
+    modulePath2Module = path: import path (inputs // moreInputs);
     builtinInstallerModules = map modulePath2Module builtinModulesPaths;
   in
     builtins.foldl' lib.recursiveUpdate {

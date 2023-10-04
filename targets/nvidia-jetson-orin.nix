@@ -75,7 +75,7 @@
 
           formatModule
         ]
-        ++ (import ../modules/module-list.nix)
+        ++ lib.ghaf.modules
         ++ extraModules;
     };
   in {

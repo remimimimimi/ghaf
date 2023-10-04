@@ -9,7 +9,7 @@
   version = release + versionSuffix;
 in {
   inherit release versionSuffix version;
-  modules = import ./ghaf-modules.nix {inherit lib;};
+  modules = import ../modules/module-list.nix {inherit disko;};
 
   # NOTE: Currently supports configuration that generates raw-efi image using nixos-generators
   installer = {
@@ -57,7 +57,7 @@ in {
             '';
           }
         ]
-        ++ (import ../modules/module-list.nix)
+        ++ builtins.filter (m: !builtins.isFunction m) lib.ghaf.modules
         ++ modules;
     };
   in {

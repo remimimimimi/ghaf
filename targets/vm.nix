@@ -42,7 +42,7 @@
 
           formatModule
         ]
-        ++ (import ../modules/module-list.nix);
+        ++ lib.ghaf.modules;
     };
   in {
     inherit hostConfiguration;
