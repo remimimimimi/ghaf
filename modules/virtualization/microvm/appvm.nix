@@ -107,6 +107,14 @@
 in {
   options.ghaf.virtualization.microvm.appvm = with lib; {
     enable = lib.mkEnableOption "appvm";
+
+    commonExtraModules = mkOption {
+      description = ''
+        List of additional modules that will be added to each of vm configuration.
+      '';
+      default = [];
+    };
+
     vms = with types;
       mkOption {
         description = ''
@@ -160,6 +168,17 @@ in {
               type = int;
               default = 0;
             };
+            capabilities = mkOption {
+              description = ''
+                Allow access for certain capabilities for vm.
+              '';
+              type = submodule {
+                options = {
+                  audio = mkEnableOption "audio access";
+                };
+              };
+              default = {};
+            };
           };
         });
         default = [];
@@ -185,10 +204,59 @@ in {
     };
   };
 
-  config = lib.mkIf cfg.enable {
-    microvm.vms = let
-      vms = lib.imap0 (index: vm: {"${vm.name}-vm" = makeVm {inherit index vm;};}) cfg.vms;
-    in
-      lib.foldr lib.recursiveUpdate {} vms;
-  };
+  config = let
+    vmsWithAudio = builtins.filter (vm: vm.capabilities.audio) cfg.vms;
+    anyVmWithAudio = builtins.length vmsWithAudio;
+    # Map from capability name to module.
+    capabilityVmModule = {
+      audio = {
+        # Enable pulseaudio for user ghaf
+        sound.enable = true;
+        hardware.pulseaudio.enable = true;
+        users.extraUsers.ghaf.extraGroups = ["audio"];
+        microvm.qemu.extraArgs = [
+          # Connect sound device to hosts pulseaudio socket
+          "-audiodev"
+          "pa,id=pa1,server=unix:/run/pulse/native"
+          # Add HDA sound device to guest
+          "-device"
+          "intel-hda"
+          "-device"
+          "hda-duplex,audiodev=pa1"
+        ];
+      };
+    };
+  in lib.mkMerge [
+    (lib.mkIf anyVmWithAudio {
+      # Enable pulseaudio support for host as a service
+      sound.enable = true;
+      hardware.pulseaudio.enable = true;
+      hardware.pulseaudio.systemWide = true;
+
+      # Allow microvm user to access pulseaudio
+      hardware.pulseaudio.extraConfig = "load-module module-combine-sink module-native-protocol-unix auth-anonymous=1";
+      users.extraUsers.microvm.extraGroups = ["audio" "pulse-access"];
+
+      # TODO: Require pulseaudio for vms with audio
+      # systemd.services."microvm@chromium-vm".after = ["pulseaudio.service"];
+      # systemd.services."microvm@chromium-vm".requires = ["pulseaudio.service"];
+    })
+      (lib.mkIf cfg.enable {
+        microvm.vms = let
+          vms =
+            lib.imap0 (
+              index: bareVm: let
+                vm =
+                  bareVm
+                  // {
+                    # TODO: Map capability to module if enabled.
+                    extraModules = cfg.commonExtraModules ++ bareVm.extraModules;
+                  };
+              in {"${vm.name}-vm" = makeVm {inherit index vm;};}
+            )
+            cfg.vms;
+        in
+          lib.foldr lib.recursiveUpdate {} vms;
+      })
+    ];
 }
