@@ -15,4 +15,5 @@
   nm-launcher = final.callPackage ../../packages/nm-launcher {};
   labwc = import ./labwc {inherit final prev;};
   tpm2-pkcs11 = import ./tpm2-pkcs11 {inherit prev;};
+  ghaf = final.callPackage ../../packages/ghaf {};
 })

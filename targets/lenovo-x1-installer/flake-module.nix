@@ -20,7 +20,7 @@
           modulesPath,
           ...
         }: let
-          installScript = pkgs.callPackage ../packages/installer {
+          installScript = pkgs.callPackage ../../packages/installer {
             inherit imagePath;
           };
         in {
