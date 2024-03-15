@@ -20,6 +20,7 @@
   ## To here
 
   lenovo-x1 = variant: extraModules: let
+    name' = "${name}-${variant}";
     hostConfiguration = lib.nixosSystem {
       inherit system;
       specialArgs = {inherit lib;};
@@ -155,12 +156,16 @@
 
             boot.initrd.availableKernelModules = ["nvme"];
           })
+
+          ({pkgs, ...}: {
+            environment.systemPackages = [(pkgs.callPackage ../../packages/ghaf {targetName = name'; ghafSource = self; configPath = "/home/ghaf/.config/ghaf";}) ];
+          })
         ]
         ++ extraModules;
     };
   in {
     inherit hostConfiguration;
-    name = "${name}-${variant}";
+    name = name';
     package = hostConfiguration.config.system.build.diskoImages;
   };
 in [

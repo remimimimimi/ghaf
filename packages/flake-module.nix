@@ -35,7 +35,6 @@
         #         in
         #           cfg.options;
       };
-      ghaf = callPackage ./ghaf {};
     };
   };
 }

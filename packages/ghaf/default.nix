@@ -1,25 +1,23 @@
 # Copyright 2022-2024 TII (SSRC) and the Ghaf contributors
 # SPDX-License-Identifier: Apache-2.0
 {
-  stdenvNoCC,
+  substituteAll,
   lib,
   python3,
-  # python3Packages,
+  targetName,
+  ghafSource,
+  configPath,
 }:
 # with python3Packages;
-stdenvNoCC.mkDerivation {
+substituteAll {
+  dir = "bin";
+  isExecutable = true;
+
   name = "ghaf";
-  version = "0.1.0";
-  propagatedBuildInputs = [
-    (python3.withPackages (pythonPackages:
-      with pythonPackages; [
-        # consul
-        # six
-        # requests2
-      ]))
-  ];
-  dontUnpack = true;
-  installPhase = "install -Dm755 ${./ghaf.py} $out/bin/ghaf";
+  pname = "ghaf";
+  src = ./ghaf.py;
+
+  inherit python3 targetName ghafSource configPath;
 
   meta = with lib; {
     description = "Application that helps you managing Ghaf.";

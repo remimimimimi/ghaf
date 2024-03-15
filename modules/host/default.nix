@@ -10,8 +10,6 @@
 }: {
   networking.hostName = lib.mkDefault "ghaf-host";
 
-  environment.systemPackages = [pkgs.ghaf];
-
   # Overlays should be only defined for host, because microvm.nix uses the
   # pkgs that already has overlays in place. Otherwise the overlay will be
   # applied twice.
