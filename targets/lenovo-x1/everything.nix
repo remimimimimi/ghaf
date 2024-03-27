@@ -144,8 +144,8 @@
     package = hostConfiguration.config.system.build.diskoImages;
   };
 in [
-  (lenovo-x1 "gen10" "debug" [self.nixosModules.disko-lenovo-x1-basic-v1 self.nixosModules.hw-lenovo-x1])
-  (lenovo-x1 "gen11" "debug" [self.nixosModules.disko-lenovo-x1-basic-v1 self.nixosModules.hw-lenovo-x1])
-  (lenovo-x1 "gen10" "release" [self.nixosModules.disko-lenovo-x1-basic-v1 self.nixosModules.hw-lenovo-x1])
-  (lenovo-x1 "gen11" "release" [self.nixosModules.disko-lenovo-x1-basic-v1 self.nixosModules.hw-lenovo-x1])
+  (lenovo-x1 "gen10" "debug" [self.nixosModules.disko-ab-partitions-v1 self.nixosModules.hw-lenovo-x1])
+  (lenovo-x1 "gen11" "debug" [self.nixosModules.disko-ab-partitions-v1 self.nixosModules.hw-lenovo-x1])
+  (lenovo-x1 "gen10" "release" [self.nixosModules.disko-ab-partitions-v1 self.nixosModules.hw-lenovo-x1])
+  (lenovo-x1 "gen11" "release" [self.nixosModules.disko-ab-partitions-v1 self.nixosModules.hw-lenovo-x1])
 ]

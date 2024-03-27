@@ -179,11 +179,18 @@ in {
             Path to the disk
           '';
         };
+        options.imageSize = mkOption {
+          type = types.str;
+          description = ''
+            Size of the image
+          '';
+        };
       });
       default = {};
       example = literalExpression ''
         {
           disk1.device = "/dev/nvme0n1";
+          disk1.imageSize = "100G"
         }
       '';
     };
