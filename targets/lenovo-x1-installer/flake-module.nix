@@ -24,11 +24,12 @@
         }: let
           diskoInstall = inputs.disko.packages.${system}.disko-install;
           installScript = pkgs.callPackage ../../packages/installer {
-            inherit diskoInstall targetName;
+            inherit diskoInstall target targetName;
             ghafSource = self;
 
             # Suppose that we have only one "main" disk required
-            diskName = with builtins; head (attrNames target.config.ghaf.hardware.definition.disks);
+            # diskName = with builtins; head (attrNames target.config.ghaf.hardware.definition.disks);
+            diskName = "disk1";
           };
 
           dependencies =

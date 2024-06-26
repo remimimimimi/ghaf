@@ -155,6 +155,7 @@
         ./nix/flake-module.nix
         ./packages/flake-module.nix
         ./targets/flake-module.nix
+        ./vms/flake-module.nix
         ./hydrajobs/flake-module.nix
         ./tests/flake-module.nix
         ./templates/flake-module.nix

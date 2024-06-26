@@ -24,6 +24,51 @@
           self.nixosModules.microvm
           self.nixosModules.reference-appvms
           self.nixosModules.reference-programs
+          self.nixosModules.installer
+
+          ({pkgs, lib, ...}: {
+            ghaf.installer.storage.vm = [
+              (let
+                drv = self.nixosConfigurations.emacs-vm.config.microvm.declaredRunner;
+                closure = pkgs.closureInfo {rootPaths = [drv];};
+                # Returns list of strings
+                storePaths = lib.strings.splitString "\n" (lib.strings.removeSuffix "\n" (builtins.readFile "${closure}/store-paths"));
+                bashArray = lib.strings.escapeShellArgs storePaths;
+              in
+                pkgs.runCommandLocal "emacs-dependencies" {} ''
+                  mkdir -p $out/nix/{var,store}
+                  cp -r ${bashArray} $out/nix/store
+                  #
+                  cp ${drv.outPath + "/bin/microvm-run"} $out/emacs-vm-run
+                ''
+              )
+            ];
+
+            # We need to add service that will mount vm_storage partition nix store to the host nix store to make everything work.
+            # TODO: Add one more service to store /var on gp_storage.
+            systemd.services = {
+              mountVmStorageNixStore = {
+                enable = true;
+                after = ["zfs.target"];
+                wantedBy = ["microvms.target"];
+                description = "Mount vm storage nix store to host nix store.";
+                serviceConfig = {
+                  Type = "simple";
+                  ExecStart = let
+                    workDir = "/vm_storage/work";
+                    hostStore = "/nix/store";
+                    vmStore = "/vm_storage/nix";
+                  in ''
+                    mkdir -p ${workDir} && \
+                    ${pkgs.coreutils}/bin/mount -t overlay overlay -olowerdir=${hostStore},upperdir=${vmStore},workdir=${workDir}  ${hostStore}
+                  '';
+                };
+
+              };
+
+              # mountVar
+            };
+          })
 
           ({
             pkgs,

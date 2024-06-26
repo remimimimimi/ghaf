@@ -5,11 +5,17 @@
   stdenvNoCC,
   makeWrapper,
   diskoInstall,
+  target,
   targetName,
   ghafSource,
   diskName,
 }: let
   name = "ghaf-installer";
+  vmStorageDrvs = target.config.ghaf.installer.storage.vm;
+  # By convention this derivation contains file structure (e.g /nix/store prefix).
+  vmStoragePaths = map (drv: drv.outPath) vmStorageDrvs;
+  # TODO: Copy files from all provided derivations.
+  vmStoragePath = builtins.head vmStoragePaths + "/*";
 in
   stdenvNoCC.mkDerivation {
     inherit name;
@@ -25,6 +31,7 @@ in
         --set GHAF_SOURCE "${ghafSource}" \
         --set TARGET_NAME "${targetName}" \
         --set DISKO_DISK_NAME "${diskName}" \
+        --set VM_STORAGE_SOURCE_PATH "${vmStoragePath}" \
         --prefix PATH : ${lib.makeBinPath [diskoInstall]}
     '';
   }

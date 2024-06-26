@@ -36,7 +36,7 @@ if [ -z ${DEVICE_PATH+x} ]; then
 fi
 
 echo "Installing..."
-disko-install --write-efi-boot-entries --debug --flake "$GHAF_SOURCE#$TARGET_NAME" --disk "$DISKO_DISK_NAME" "$DEVICE_PATH" --option substitute false --option binary-caches ""
+disko-install --write-efi-boot-entries --debug --flake "$GHAF_SOURCE#$TARGET_NAME" --disk "$DISKO_DISK_NAME" "$DEVICE_PATH" --option substitute false --option binary-caches "" --extra-files $VM_STORAGE_SOURCE_PATH "/vm_storage"
 
 echo ""
 echo "Installation done. Please remove the installation media and reboot"
