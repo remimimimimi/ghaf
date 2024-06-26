@@ -15,7 +15,7 @@
   # By convention this derivation contains file structure (e.g /nix/store prefix).
   vmStoragePaths = map (drv: drv.outPath) vmStorageDrvs;
   # TODO: Copy files from all provided derivations.
-  vmStoragePath = builtins.head vmStoragePaths + "/*";
+  vmStoragePath = builtins.head vmStoragePaths;
 in
   stdenvNoCC.mkDerivation {
     inherit name;

@@ -1,4 +1,8 @@
-{inputs, lib, ...}: {
+{
+  inputs,
+  lib,
+  ...
+}: {
   flake.nixosConfigurations = let
     system = "x86_64-linux";
   in {

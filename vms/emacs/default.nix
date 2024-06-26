@@ -1,5 +1,9 @@
-{microvm}:
-{config, lib, pkgs, ...}: {
+{microvm}: {
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   imports = let
     vm = {
       name = "emacs";
@@ -8,6 +12,7 @@
       ramMb = 1024;
       cores = 1;
       borderColor = "#3E0C5C";
+      cid = 50;
     };
     vmName = "${vm.name}-vm";
     index = 0;
@@ -19,8 +24,71 @@
       internalIP = index + 150;
     })
     (import ../../modules/common)
-    ({...}: {
-      environment.systemPackages = vm.packages;
+    (_: let
+      platform = "x86_64-linux";
+      waypipePort = 1100;
+
+      waypipeBorder =
+        if vm.borderColor != null
+        then "--border \"${vm.borderColor}\""
+        else "";
+      runWaypipe = pkgs.writeScriptBin "run-waypipe" ''
+        #!${pkgs.runtimeShell} -e
+        ${pkgs.waypipe}/bin/waypipe --vsock -s ${toString waypipePort} ${waypipeBorder} server "$@"
+      '';
+    in {
+      nixpkgs.buildPlatform.system = platform;
+      nixpkgs.hostPlatform.system = platform;
+
+      environment.systemPackages =
+        vm.packages
+        ++ [
+          pkgs.waypipe
+          runWaypipe
+          pkgs.tpm2-tools
+          pkgs.opensc
+        ];
+
+      ghaf = {
+        users.accounts.enable = true;
+        profiles.debug.enable = true;
+
+        # development = {
+        #   debug.tools.enable = true;
+        #   nix-setup.enable = true;
+        # };
+      };
+
+      microvm = {
+        optimize.enable = false;
+        mem = vm.ramMb;
+        vcpu = vm.cores;
+        hypervisor = "qemu";
+        # shares = [
+        #   {
+        #     tag = "waypipe-ssh-public-key";
+        #     source = configHost.ghaf.security.sshKeys.waypipeSshPublicKeyDir;
+        #     mountPoint = configHost.ghaf.security.sshKeys.waypipeSshPublicKeyDir;
+        #   }
+        #   {
+        #     tag = "ro-store";
+        #     source = "/nix/store";
+        #     mountPoint = "/nix/.ro-store";
+        #   }
+        # ];
+        # writableStoreOverlay = if config.ghaf.development.debug.tools.enable "/nix/.rw-store";
+
+        qemu = {
+          extraArgs = [
+            "-M"
+            "accel=kvm:tcg,mem-merge=on,sata=off"
+            "-device"
+            "vhost-vsock-pci,guest-cid=${toString vm.cid}"
+          ];
+
+          machine = "q35";
+        };
+      };
     })
     # ({
     #   lib,
