@@ -57,9 +57,9 @@ Do the following:
     ```
     nix build github:tiiuae/ghaf#generic-x86_64-debug
     ```
-2. After the build is completed, prepare a USB boot media with the target image you built:
+2. After the build is completed, prepare a USB boot media with the target image you built using the `flash.sh` script:
     ```
-    dd if=./result/nixos.img of=/dev/<YOUR_USB_DRIVE> bs=32M status=progress oflag=direct
+    ./flash.sh <YOUR_USB_DRIVE>
     ```
 3. Boot the computer from the USB media.
 
@@ -74,9 +74,9 @@ Do the following:
     ```
     nix build github:tiiuae/ghaf#lenovo-x1-carbon-gen11-debug
     ```
-2. After the build is completed, prepare a USB boot media with the target image you built:
+2. After the build is completed, prepare a USB boot media with the target image you built using the `flash.sh` script:
     ```
-    dd if=./result/nixos.img of=/dev/<YOUR_USB_DRIVE> bs=32M status=progress oflag=direct
+    ./flash.sh <YOUR_USB_DRIVE>
     ```
 3. Boot the computer from the USB media.
 
@@ -128,9 +128,9 @@ After the latest firmware is [flashed](./build_and_run.md#flashing-nvidia-jetson
     ```
     nix build github:tiiuae/ghaf#nvidia-jetson-orin-agx-debug
     ```
-2. After the build is completed, prepare a USB boot media with the target image you built:
+2. After the build is completed, prepare a USB boot media with the target image you built using the `flash.sh` script:
     ```
-    dd if=./result/nixos.img of=/dev/<YOUR_USB_DRIVE> bs=32M status=progress oflag=direct
+    ./flash.sh <YOUR_USB_DRIVE>
     ```
 3. Boot the hardware from the USB media.
 
