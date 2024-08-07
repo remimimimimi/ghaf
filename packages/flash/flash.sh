@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if the script is run with an argument
 if [ $# -ne 1 ]; then
@@ -8,7 +8,7 @@ fi
 
 # Store the input argument in a variable
 DEVICE=$1
-OUTPUT_DIR="result"
+OUTPUT_DIR=$(dirname "$0")/..
 UNCOMPRESSED_NAME="nixos.img"
 COMPRESSED_NAME="disk1.raw.zst"
 
@@ -20,7 +20,7 @@ fi
 wipe_filesystem () {
     echo "Wiping filesystem..."
     # Unmount possible mounted filesystems
-    sync; sudo umount -q "$DEVICE"*;
+    sync; sudo umount -q "$DEVICE"* || true;
     # Wipe first 100MB of disk
     sudo dd if=/dev/zero of="$DEVICE" bs=100M count=1 conv=fsync
     SECTORS=$(sudo fdisk -l "$DEVICE" | head -n 1 |  awk '{print $7}')
