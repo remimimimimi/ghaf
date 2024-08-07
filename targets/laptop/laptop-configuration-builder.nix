@@ -21,8 +21,13 @@
           self.nixosModules.microvm
           #TODO see the twisted dependencies in common/desktop
 
-          (_: {
+          ({pkgs, lib, config, ...}: {
             time.timeZone = "Asia/Dubai";
+
+            system.build.diskoImagesWithFlash = pkgs.symlinkJoin {
+              name = "diskoImagesWithFlash";
+              paths = [config.system.build.diskoImages (pkgs.callPackage ../../packages/flash {})];
+            };
 
             ghaf = {
               profiles = {
@@ -38,7 +43,7 @@
   in {
     inherit hostConfiguration;
     name = "${machineType}-${variant}";
-    package = hostConfiguration.config.system.build.diskoImages;
+    package = hostConfiguration.config.system.build.diskoImagesWithFlash;
   };
 in
   mkLaptopConfiguration
