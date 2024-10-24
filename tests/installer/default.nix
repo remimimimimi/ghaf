@@ -27,6 +27,8 @@ let
         # https://github.com/nix-community/disko/blob/e55f9a8678adc02024a4877c2a403e3f6daf24fe/lib/interactive-vm.nix#L63
         boot.zfs.devNodes = "/dev/disk/by-uuid"; # needed because /dev/disk/by-id is empty in qemu-vms
         boot.zfs.forceImportAll = true;
+
+        ghaf.hardware.x86_64.common.enable = true;
       })
     ];
   };
@@ -74,7 +76,19 @@ pkgs.nixosTest {
           "-drive",
           "if=pflash,format=raw,unit=0,readonly=on,file=${pkgs.OVMF.firmware}",
           "-drive",
-          "if=pflash,format=raw,unit=1,readonly=on,file=${pkgs.OVMF.variables}"
+          "if=pflash,format=raw,unit=1,readonly=on,file=${pkgs.OVMF.variables}",
+
+          "-chardev", "socket,id=chrtpm,path=/tmp/mytpm1/swtpm-sock",
+          "-tpmdev", "emulator,id=tpm0,chardev=chrtpm",
+          "-device", "tpm-tis,tpmdev=tpm0",
+
+          "-device", "virtio-gpu",
+
+          "-net", "nic,netdev=user.0,model=virtio",
+          "-netdev", "user,id=user.0,\"$QEMU_NET_OPTS\"",
+
+          # "-tpmdev", "passthrough,id=tpm0,path=/dev/tpm0",
+          # "-device", "tpm-tis,tpmdev=tpm0"
       ]
       machine = create_machine(start_command=" ".join(start_command), **kwargs)
       driver.machines.append(machine)
@@ -93,6 +107,7 @@ pkgs.nixosTest {
     print(new_machine.succeed("tty"))
     name = new_machine.succeed("cat /proc/sys/kernel/hostname").strip()
     assert name == "${expectedHostname}", f"expected hostname '${expectedHostname}', got {name}"
+    breakpoint()
     new_machine.shutdown()
   '';
 }

@@ -13,6 +13,7 @@
         in
         {
           installer = pkgs.callPackage ./installer { inherit self; };
+          system = pkgs.callPackage ./system.nix { inherit self; };
         };
     };
 }
